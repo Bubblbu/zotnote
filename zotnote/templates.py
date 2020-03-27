@@ -5,11 +5,11 @@ import datetime
 
 from jinja2 import Template
 
-from zotnote import AUTHOR, notes_dir
+from zotnote import data_dir
 
 
-class MarkdownTemplate():
-    def __init__(self, citekey, fieldValues):
+class MarkdownNote():
+    def __init__(self, citekey, fieldValues, config):
         self.citekey = citekey
         self.fieldValues = fieldValues
 
@@ -17,8 +17,9 @@ class MarkdownTemplate():
         self.ts_iso = self.ts.isoformat(timespec="seconds")
         self.ts_day = self.ts.strftime("%m.%d.%y")
 
-        self.author = AUTHOR
-        filein = notes_dir / "template.j2"
+        self.author = config['name']
+
+        filein = data_dir / "templates/template.j2"
         self.__template = Template(filein.read_text())
 
     def __str__(self):

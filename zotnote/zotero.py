@@ -2,8 +2,7 @@
 # # -*- coding: utf-8 -*-
 import json
 import sqlite3
-
-from zotnote import zotero_dir
+from pathlib import Path
 
 
 class BetterBibtexException(Exception):
@@ -15,7 +14,7 @@ class ZoteroDBConnector():
     Better Bibtex's local SQLite databases.
     """
 
-    def __init__(self, citekey):
+    def __init__(self, citekey, config):
         self.__citekey = citekey
         self.__itemID = None
 
@@ -34,6 +33,8 @@ class ZoteroDBConnector():
             'date': "",
             'creator': ""
         }
+
+        self.zotero_dir = Path(config['zotero'])
 
     def __get_value_id(self):
         results = self.__zotero.execute(
@@ -68,7 +69,7 @@ class ZoteroDBConnector():
         return "; ".join(creators)
 
     def citekey_lookup(self):
-        better_bibtex = sqlite3.connect(str(zotero_dir / "better-bibtex.sqlite.bak"))
+        better_bibtex = sqlite3.connect(str(self.zotero_dir / "better-bibtex.sqlite.bak"))
         keys_string = better_bibtex.execute(
             'SELECT data FROM "better-bibtex" WHERE name="better-bibtex.citekey"')
         keys_dict = json.loads(keys_string.fetchone()[0])
@@ -83,7 +84,7 @@ class ZoteroDBConnector():
                                         " your Zotero library")
 
     def get_field_values(self):
-        self.__zotero = sqlite3.connect(str(zotero_dir / "zotero.sqlite.bak"))
+        self.__zotero = sqlite3.connect(str(self.zotero_dir / "zotero.sqlite.bak"))
 
         valueIDs = self.__get_value_id()
         for l, fID in self.__fieldIDs.items():

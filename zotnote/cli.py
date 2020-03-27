@@ -1,22 +1,23 @@
-#!/usr/bin/env python
 # # -*- coding: utf-8 -*-
 import sys
 from distutils.util import strtobool
+from pathlib import Path
 
 import click
 
-from zotnote.templates import MarkdownTemplate
+from zotnote.templates import MarkdownNote
 from zotnote.zotero import BetterBibtexException, ZoteroDBConnector
-
-from zotnote import AUTHOR, notes_dir, zotero_dir, templates_dir
+from zotnote.config import Configuration
 
 
 @click.command()
 @click.argument('citekey')
 def new(citekey):
     """Create reading note for CITEKEY in your Zotero library."""
+    config = Configuration().load_config()
+
     # Retrieve Information from Zotero
-    zotero = ZoteroDBConnector(citekey)
+    zotero = ZoteroDBConnector(citekey, config)
 
     try:
         zotero.citekey_lookup()
@@ -39,9 +40,10 @@ def new(citekey):
         sys.exit()
 
     # Fill template
-    md = MarkdownTemplate(citekey, fieldValues)
+    md = MarkdownNote(citekey, fieldValues, config)
 
     # Write output file
+    notes_dir = Path(config['notes'])
     outfile = notes_dir / f"{citekey}.md"
 
     if outfile.exists():
@@ -58,7 +60,7 @@ def new(citekey):
 
 @click.command(help="Configure Zotnote from the command line")
 def config():
-    click.echo("Not implemented yet.")
+    Configuration().create_config()
 
 
 @click.command(help="Create a small, basic report based on the notes")
@@ -71,21 +73,3 @@ def cli():
     """Zotnote is a CLI-tool to streamline reading notes with Zotero
     """
     pass
-
-
-# if __name__ == "__main__":
-#     # Load variables from .env
-#     load_dotenv(find_dotenv())
-
-#     project_dir = Path(__file__).resolve().parents[1]
-#     templates_dir = project_dir / "templates"
-
-#     notes_dir = Path(os.getenv("NOTES_DIR"))
-#     zotero_dir = Path(os.getenv("ZOTERO_DIR"))
-
-#     AUTHOR = os.getenv("AUTHOR")
-
-#     cli.add_command(new)
-#     cli.add_command(report)
-#     cli.add_command(config)
-#     cli()
