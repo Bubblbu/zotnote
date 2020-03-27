@@ -1,14 +1,16 @@
 # ZotNote
 
-> A helper tool that automatises your reading notes with Zotero.
+> Automatize and manage your reading notes with Zotero & Better Bibtex Plugin (BBT). **Note: ZotNote is still in early development and not production ready**
 
-Vision: A literature review suite that connects to Zotero/Better-Bibtex. Writing and accessing reading notes plus some basic qualitative text analytics based on the written notes.
+[![PyPI version](https://img.shields.io/pypi/v/zotnote.svg)](https://pypi.python.org/pypi/zotnote/)
 
-## Current features
+---
+
+*Current features*
 
 - Very simple installation via pip
 - Clean (very basic) CLI
-- Connects to local Zotero and Better Bibtex databases to retrieve metadata
+- Connects to local Zotero & BBT databases to retrieve metadata
 - Supports custom [Jinja2](https://jinja.palletsprojects.com/en/2.11.x/) templates for reading notes
 
 *Planned features*
@@ -20,33 +22,62 @@ Vision: A literature review suite that connects to Zotero/Better-Bibtex. Writing
 - Simple reports about progress of literature review 
 - (*dreaming*) Automatically export collection of notes as an annotated bibliography.
 
-## Getting started
+*Long-term vision*
+
+A literature review suite that connects to Zotero & BBT. Management of reading notes, reading/writing analytics, and basic qualitative text analysis (export reports as HTML via Jupyter notebooks). Export of reading notes in different formats (e.g., annotated bibliography).
+
+## Installation
 
 ### Requirements
 
-I have currently only used the script on my own Linux machine.
+- [Python](https://www.python.org/downloads/) 3.6 or higher
+- [Zotero Standalone](https://www.zotero.org/) with [Better Bibtex plugin](https://github.com/retorquere/zotero-better-bibtex)
 
-- Python 3.6 (I am currently using f-strings)
-- [Zotero Standalone](https://www.zotero.org/)
-- [Better Bibtex plugin](https://github.com/retorquere/zotero-better-bibtex)
+### Recommended: Install via pipx
 
-### Installation
-
-The recommended way to install ZotNote is using [pipx](https://pipxproject.github.io/pipx/).
+The recommended way to install ZotNote is using [pipx](https://pipxproject.github.io/pipx/). Pipx cleanly install the package in an isolated environment (clean uninstalls!) and automagically exposes the CLI-endpoints globally on your system.
 
 ```bash
 pipx install zotnote
+
 ```
 
-Pipx cleanly install the package in an isolated environment (clean uninstalls!) and automagically exposes the cli-endpoints globally on your system.
 
-However, you can also simply use pip.
+### Option 2: Install via pip
+
+However, you can also simply use pip. Please be aware of the Python version and environments you are using.
 
 ```bash
 pip install zotnote
 ```
 
-## Usage
+### Option 3: Download from GitHub
+
+Download the latest release from Github and unzip. Put the folder containing the scripts into your `PATH`. 
+
+Alternatively, run
+
+```bash
+[sudo] python3 setup.py install
+```
+
+or
+
+```bash
+python3 setup.py install --user
+```
+
+### Option 4: Git clone (for developers)
+
+```bash
+git clone git@github.com:Bubblbu/zotnote.git
+```
+
+The project is being developed with [Poetry](https://python-poetry.org/) as a dependency manager.
+
+More instructions will follow soon!
+
+## Getting started
 
 ### Configuration
 
@@ -58,16 +89,10 @@ ZotNote currently asks you for:
 - Path to your Zotero installation
 - A folder to store your reading notes
 
-### Creating your own notes
+### Usage
 
 `zotnote new [citekey]` should be all you need to start creating your notes. The script will retrieve all required metadata from Zotero and populate the template stored in your notes folder and create a new reading note.
 
-## Developers
-
-The project is being developed with [Poetry](https://python-poetry.org/) as a dependency manager.
-
-More instructions will follow soon!
-
 ## Authors
 
-Written by Asura Enkhbayar while he was quarantined.
+Written by [Asura Enkhbayar](https://twitter.com/bubblbu_) while he was quarantined.
