@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 from tomlkit import comment, document, dumps, loads, nl
 
-from zotnote import config_dir, data_dir
+from zotnote import config_dir, data_dir, project_dir
 
 
 class Configuration:
@@ -15,18 +15,25 @@ class Configuration:
     """
     config_file = config_dir / "config.toml"
     templates_dir = data_dir / "templates"
+    pkg_templates_dir = project_dir / "templates"
 
-    def __init__(self):
-        # check if config file exists
-        if not self.config_file.exists():
+    @classmethod
+    def check_files(cls):
+        if not cls.config_file.exists():
             click.echo("Missing configuration file. Proceeding to create a new one.")
-            self.create_config_dir()
-            self.create_config()
+            cls.create_config_dir()
+            cls.create_config()
 
-        if not self.templates_dir.exists():
+        if not cls.templates_dir.exists():
             click.echo("App data missing. Proceeding to copy templates.")
-            self.create_datadir()
-            self.copy_templates()
+            cls.create_datadir()
+            cls.copy_templates()
+
+        pkg_templates = len(list(cls.pkg_templates_dir.glob("*.j2")))
+        lc_templates = len(list(cls.templates_dir.glob("*.j2")))
+        if lc_templates < pkg_templates:
+            click.echo("Template files are missing in app data. Copying...")
+            cls.copy_templates()
 
     @classmethod
     def load_config(cls):
@@ -69,8 +76,7 @@ class Configuration:
 
     @classmethod
     def copy_templates(cls):
-        template_dir_dist = Path(".").parent / "templates"
-        for f in template_dir_dist.glob("*.j2"):
+        for f in cls.pkg_templates_dir.glob("*.j2"):
             shutil.copyfile(f, cls.templates_dir / f.name)
 
     @staticmethod

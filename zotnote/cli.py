@@ -5,9 +5,9 @@ from pathlib import Path
 
 import click
 
-from zotnote.templates import MarkdownNote
-from zotnote.zotero import BetterBibtexException, ZoteroDBConnector
-from zotnote.config import Configuration
+from .templates import MarkdownNote
+from .zotero import BetterBibtexException, ZoteroDBConnector
+from .config import Configuration
 
 
 @click.command()
@@ -72,4 +72,3 @@ def report():
 def cli():
     """Zotnote is a CLI-tool to streamline reading notes with Zotero
     """
-    pass
