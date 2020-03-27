@@ -13,6 +13,8 @@ packages = [
     { include = "zotnote" }
 ]
 
+include = ["templates/*"]
+
 keywords = ['zotero', 'literature-review', 'reading-notes']
 
 readme = 'README.md'
@@ -24,6 +26,8 @@ python = "^3.6"
 click = "^7.1.1"
 jinja2 = "^2.11.1"
 python-dotenv = "^0.12.0"
+xdg = "^4.0.1"
+tomlkit = "^0.5.11"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.7.9"
