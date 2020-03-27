@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # # -*- coding: utf-8 -*-
-import argparse
+import click
 import datetime
 import json
 import sqlite3
 import sys
 from distutils.util import strtobool
 from pathlib import Path
-from string import Template
+import click
 
 ZOTERO = Path("/home/asura/Zotero/")
 NOTES = Path("/home/asura/Documents/notes/")
@@ -116,7 +116,8 @@ class ZoteroDBConnector():
         if self.__citekey in k:
             self.itemID = k[self.__citekey]
         else:
-            raise BetterBibtexException(f"Couldn't find f{self.__citekey} in Better Bibtex")
+            raise BetterBibtexException(f"Couldn't find \"{self.__citekey}\" in"
+                                        " your Zotero library")
 
     def get_field_values(self):
         self.__zotero = sqlite3.connect(str(ZOTERO / "zotero.sqlite.bak"))
@@ -145,51 +146,70 @@ class ZoteroDBConnector():
 if __name__ == "__main__":
     """This is ZotNote.
     """
-    # Arguments
+    # Initialize argument parser
     parser = argparse.ArgumentParser(
+        prog="ZotNote",
         description='This is a script that fetches data from local Zotero'
                     'databases and creates a template for reading notes.')
-    parser.add_argument("cite_key", action="store", type=str)
+    
+    new_group = parser.add_argument_group()
+    report_group = parser.add_mutually_exclusive_group(required=True)
+    parser.add
+    # Add arguments
+    parser.add_argument("command", action="store", type=str,
+                        choices=["new", "report"], metavar="COMMAND",
+                        help="Actions that you can run")
+    new_group.add_argument("citekey", action="store", type=str, metavar="CITEKEY",
+                        help="The citekey for selected entry as managed by"
+                        "better-bibtex-plugin")
+
+    # Parse arguments from command line
     args = parser.parse_args()
 
-    citekey = args.cite_key
+    command = args.command
+    citekey = args.citekey
 
-    # Retrieve Information from Zotero
-    zotero = ZoteroDBConnector(citekey)
+    # Mode
+    if command == "new":
+        # Retrieve Information from Zotero
+        zotero = ZoteroDBConnector(citekey)
 
-    try:
-        zotero.citekey_lookup()
-    except BetterBibtexException as e:
-        print(e)
-        sys.exit()
+        try:
+            zotero.citekey_lookup()
+        except BetterBibtexException as e:
+            print(e)
+            sys.exit()
 
-    fieldValues = zotero.get_field_values()
+        fieldValues = zotero.get_field_values()
 
-    print(f"Found entry for {citekey}:\n\n"
-          f"\tTitle: {fieldValues['title']}\n"
-          f"\tCreator: {fieldValues['creator']}\n"
-          f"\tDate: {fieldValues['date']}\n")
+        print(f"Found entry for {citekey}:\n\n"
+              f"\tTitle: {fieldValues['title']}\n"
+              f"\tCreator: {fieldValues['creator']}\n"
+              f"\tDate: {fieldValues['date']}\n")
 
-    choice = input("Continue? [y/n]\n").lower()
-    if strtobool(choice):
-        pass
-    else:
-        print("Cya!")
-        sys.exit()
-
-    # Fill template
-    md = MarkdownTemplate(citekey, fieldValues)
-
-    # Write output file
-    file = NOTES / f"{citekey}.md"
-
-    if file.exists():
-        choice = input("This file already exists. Overwrite (and lose content)? [y/n]\n").lower()
+        choice = input("Continue? [y/n]\n").lower()
         if strtobool(choice):
-            print(f"Overwriting {str(file)}")
-            file.write_text(str(md))
+            pass
         else:
-            print("I have not created a new reading note.")
-    else:
-        print(f"Writing {str(file)}")
-        file.write_text(str(md))
+            print("Cya!")
+            sys.exit()
+
+        # Fill template
+        md = MarkdownTemplate(citekey, fieldValues)
+
+        # Write output file
+        file = NOTES / f"{citekey}.md"
+
+        if file.exists():
+            choice = input(
+                "This file already exists. Overwrite (and lose content)? [y/n]\n").lower()
+            if strtobool(choice):
+                print(f"Overwriting {str(file)}")
+                file.write_text(str(md))
+            else:
+                print("I have not created a new reading note.")
+        else:
+            print(f"Writing {str(file)}")
+            file.write_text(str(md))
+    elif command == "report":
+        print("Not implemented yet")
