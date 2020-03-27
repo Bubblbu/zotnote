@@ -63,6 +63,11 @@ def config():
     Configuration().create_config()
 
 
+@click.command(help="Update templates in local app data storage")
+def update_templates():
+    Configuration.copy_templates()
+
+
 @click.command(help="Create a small, basic report based on the notes")
 def report():
     click.echo("Not implemented yet.")

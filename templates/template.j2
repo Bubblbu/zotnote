@@ -13,7 +13,7 @@ author: {{ author }}
 | Creators | {{ creator }} |
 | Citekey | {{ citekey }} |
 | Type | {{ type }} |
-| DOI | [{{ doi }}](https://doi.org/{{ doi }}) |
+| DOI | {% if doi %} [{{ doi }}](https://doi.org/{{ doi }}) {% else %}  {% endif %} |
 | Date | {{ date }} |
 
 *Keywords*:
