@@ -79,6 +79,24 @@ More instructions will follow soon!
 
 ## Getting started
 
+```
+Usage: zotnote [OPTIONS] COMMAND [ARGS]...
+
+  Automatize and manage your reading notes with Zotero & Better Bibtex
+  Plugin (BBT)
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  config            Configure Zotnote from the command line
+  edit              Open note in your editor
+  new               Create a new note
+  remove            Remove a note
+  report            Create a small, basic report based on the notes.
+  update-templates  Update templates in local app data storage
+```
+
 ### Configuration
 
 After installation you should be able to simply run `zotnote` and be prompted to a quick interactive configuration.
