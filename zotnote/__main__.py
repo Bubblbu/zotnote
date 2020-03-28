@@ -13,7 +13,7 @@ def main():
     cli.add_command(update_templates)
     cli.add_command(edit)
     cli.add_command(remove)
-    cli()
+    cli(prog_name='zotnote')
 
 
 if __name__ == "__main__":
