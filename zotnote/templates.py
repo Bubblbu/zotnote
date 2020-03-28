@@ -29,8 +29,8 @@ class MarkdownNote():
             'ts': self.ts_iso,
             'ts_day': self.ts_day,
             'title': self.fieldValues['title'],
-            'creator': self.fieldValues['creator'],
-            'date': self.fieldValues['date'],
+            'creator': self.fieldValues['author'],
+            'date': self.fieldValues['issued'],
             'doi': self.fieldValues['DOI'],
             'type': self.fieldValues['type']
         }

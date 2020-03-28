@@ -1,12 +1,6 @@
-#!/usr/bin/env python
 # # -*- coding: utf-8 -*-
-import json
 import sqlite3
 from pathlib import Path
-
-
-class BetterBibtexException(Exception):
-    pass
 
 
 class ZoteroDBConnector():
@@ -67,21 +61,6 @@ class ZoteroDBConnector():
             name = result.fetchone()
             creators.append(f"{name[1]}, {name[0]}")
         return "; ".join(creators)
-
-    def citekey_lookup(self):
-        better_bibtex = sqlite3.connect(str(self.zotero_dir / "better-bibtex.sqlite.bak"))
-        keys_string = better_bibtex.execute(
-            'SELECT data FROM "better-bibtex" WHERE name="better-bibtex.citekey"')
-        keys_dict = json.loads(keys_string.fetchone()[0])
-        better_bibtex.close()
-
-        k = {v['citekey']: v['itemID'] for v in keys_dict['data']}
-
-        if self.__citekey in k:
-            self.itemID = k[self.__citekey]
-        else:
-            raise BetterBibtexException(f"Couldn't find \"{self.__citekey}\" in"
-                                        " your Zotero library")
 
     def get_field_values(self):
         self.__zotero = sqlite3.connect(str(self.zotero_dir / "zotero.sqlite.bak"))

@@ -5,9 +5,10 @@ from pathlib import Path
 
 import click
 
-from .templates import MarkdownNote
-from .zotero import BetterBibtexException, ZoteroDBConnector
+from zotnote.connectors.bbp import BetterBibtex
+
 from .config import Configuration
+from .templates import MarkdownNote
 
 
 @click.command()
@@ -16,21 +17,23 @@ def new(citekey):
     """Create reading note for CITEKEY in your Zotero library."""
     config = Configuration().load_config()
 
-    # Retrieve Information from Zotero
-    zotero = ZoteroDBConnector(citekey, config)
-
-    try:
-        zotero.citekey_lookup()
-    except BetterBibtexException as e:
-        print(e)
+    candidates = BetterBibtex.search_citekey_in_bbp(citekey)
+    if not candidates:
+        click.echo("No results found for " + citekey)
         sys.exit()
+    else:
+        if len(candidates) != 1:
+            click.echo("More potential matching articles. More options to be implemented soon.")
+            sys.exit()
+        else:
+            candidate = candidates[0]
 
-    fieldValues = zotero.get_field_values()
+    fieldValues = BetterBibtex.extract_fields(candidate)
 
     print(f"Found entry for {citekey}:\n\n"
           f"\tTitle: {fieldValues['title']}\n"
-          f"\tCreator: {fieldValues['creator']}\n"
-          f"\tDate: {fieldValues['date']}\n")
+          f"\tCreator: {fieldValues['author']}\n"
+          f"\tDate: {fieldValues['issued']}\n")
 
     choice = click.prompt("Continue? [y/n]")
     if strtobool(choice):
@@ -60,7 +63,7 @@ def new(citekey):
 
 @click.command(help="Configure Zotnote from the command line")
 def config():
-    Configuration().create_config()
+    Configuration.create_config()
 
 
 @click.command(help="Update templates in local app data storage")
@@ -68,7 +71,7 @@ def update_templates():
     Configuration.copy_templates()
 
 
-@click.command(help="Create a small, basic report based on the notes")
+@click.command(help="Create a small, basic report based on the notes. (TBD")
 def report():
     click.echo("Not implemented yet.")
 
