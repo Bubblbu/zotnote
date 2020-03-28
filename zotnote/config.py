@@ -101,13 +101,19 @@ class Configuration:
         config = document()
         config.add(comment("Profile"))
         config.add("name", click.prompt("Enter your name"))
+        config.add("email", click.prompt("Enter your email"))
         config.add(nl())
 
         config.add(comment("Settings"))
+        config.add("editor", click.prompt(
+            "The command to execute your editor of choice."
+            "(e.g., gedit, code, or vi/m)"))
         config.add(nl())
 
         config.add(comment("Directories"))
-        config.add("zotero", click.prompt("Path to your Zotero installation"))
-        config.add("notes", click.prompt("Where do you want to store your notes"))
+        config.add("zotero", click.prompt(
+            "Enter path to your Zotero directory (usually \"~/Zotero\""))
+        config.add("notes", click.prompt(
+            "Enter location to your notes (e.g., \"~/Documents/notes/\""))
 
         return config
