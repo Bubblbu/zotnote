@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import shutil
-from distutils.util import strtobool
 from pathlib import Path
 
 import click
@@ -54,9 +53,9 @@ class Configuration:
         Loads or creates new configuration.
         """
         if cls.config_file.exists():
-            ow = click.prompt(
-                "A configuration already exists. Do you want to create a new one? [y/n]")
-            if strtobool(ow):
+            ow = click.confirm("A configuration already exists. "
+                               "Do you want to create a new one?")
+            if ow:
                 config = cls.__new_config()
                 cls.config_file.write_text(dumps(config))
             else:

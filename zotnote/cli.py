@@ -1,6 +1,5 @@
 # # -*- coding: utf-8 -*-
 import sys
-from distutils.util import strtobool
 from pathlib import Path
 
 import click
@@ -30,16 +29,16 @@ def new(citekey):
 
     fieldValues = BetterBibtex.extract_fields(candidate)
 
-    print(f"Found entry for {citekey}:\n\n"
-          f"\tTitle: {fieldValues['title']}\n"
-          f"\tCreator: {fieldValues['author']}\n"
-          f"\tDate: {fieldValues['issued']}\n")
+    click.echo(f"Found entry for {citekey}:\n\n"
+               f"\tTitle: {fieldValues['title']}\n"
+               f"\tCreator: {fieldValues['author']}\n"
+               f"\tDate: {fieldValues['issued']}\n")
 
-    choice = click.prompt("Continue? [y/n]")
-    if strtobool(choice):
+    choice = click.confirm("Continue?")
+    if choice:
         pass
     else:
-        print("Cya!")
+        click.echo("Cya!")
         sys.exit()
 
     # Fill template
@@ -50,14 +49,14 @@ def new(citekey):
     outfile = notes_dir / f"{citekey}.md"
 
     if outfile.exists():
-        choice = click.prompt('This file already exists. Overwrite (and lose content)? [y/n]')
-        if strtobool(choice):
-            print(f"Overwriting {str(outfile)}")
+        choice = click.confirm('This file already exists. Overwrite (and lose content)?')
+        if choice:
+            click.echo(f"Overwriting {str(outfile)}")
             outfile.write_text(str(md))
         else:
-            print("I have not created a new reading note.")
+            click.echo("I have not created a new reading note.")
     else:
-        print(f"Writing {str(outfile)}")
+        click.echo(f"Writing {str(outfile)}")
         outfile.write_text(str(md))
 
 
