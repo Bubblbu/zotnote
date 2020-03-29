@@ -157,19 +157,18 @@ def remove(citekey):
         click.echo("This note does not exist.")
 
 
-@click.command(help="Configure Zotnote from the command line")
+@click.command()
 def config():
+    """Configure Zotnote from the command line.
+    """
     Configuration.create_config()
 
 
-@click.command(help="Update templates in local app data storage")
-def update_templates():
-    Configuration.copy_templates()
-
-
-@click.command(help="Create a small, basic report based on the notes.")
+@click.command()
 def report():
-    click.echo("Not implemented yet.")
+    """Create a small, basic report based on the notes.
+    """
+    NotImplemented
 
 
 @click.group()
