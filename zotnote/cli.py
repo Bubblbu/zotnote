@@ -47,10 +47,15 @@ def create_note(citekey, config, bbt, force):
         outfile.write_text(str(md))
 
 
-@click.command(help="Create a new note. If no citekey is provided the Zotero picker is launched.")
+@click.command()
 @click.argument('citekey', required=False)
 @click.option("-f", "--force", is_flag=True, help="Overwrite existing notes")
 def add(citekey, force):
+    """
+    Create a new note. If no citekey is provided the Zotero picker is launched.
+
+    CITEKEY is the cite key created by BBT.
+    """
     config = Configuration.load_config()
 
     try:
@@ -73,9 +78,14 @@ def add(citekey, force):
     create_note(citekey, config, bbt, force)
 
 
-@click.command(help="Open note in your editor")
-@click.argument('citekey')
+@click.command()
+@click.argument('citekey', required=False)
 def edit(citekey):
+    """
+    Open a note in your editor of choice.
+
+    CITEKEY is the cite key created by BBT.
+    """
     config = Configuration.load_config()
 
     try:
@@ -109,8 +119,12 @@ def edit(citekey):
 
 
 @click.command(help="Remove a note")
-@click.argument('citekey')
+@click.argument('citekey', required=False)
 def remove(citekey):
+    """Remove a note.
+
+    CITEKEY is the cite key created by BBT.
+    """
     config = Configuration.load_config()
 
     try:
