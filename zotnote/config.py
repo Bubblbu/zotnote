@@ -79,24 +79,6 @@ class Configuration:
             shutil.copyfile(f, cls.templates_dir / f.name)
 
     @staticmethod
-    def locate(cwd):
-        candidates = [Path(cwd)]
-        candidates.extend(Path(cwd).parents)
-
-        for path in candidates:
-            poetry_file = path / "pyproject.toml"
-
-            if poetry_file.exists():
-                return poetry_file
-
-        else:
-            raise RuntimeError(
-                "Poetry could not find a pyproject.toml file in {} or its parents".format(
-                    cwd
-                )
-            )
-
-    @staticmethod
     def __new_config():
         config = document()
         config.add(comment("Profile"))
