@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 import click
+from click_option_group import optgroup, RequiredMutuallyExclusiveOptionGroup
 
 from zotnote.connectors.bbt import (BetterBibtex, BetterBibtexException,
                                     BetterBibtexNotRunning)
@@ -158,10 +159,29 @@ def remove(citekey):
 
 
 @click.command()
-def config():
+@optgroup("Edit configuration", cls=RequiredMutuallyExclusiveOptionGroup,
+          help="Interact with the configuration")
+@optgroup.option("-l", "--list", is_flag=True, help="List all config key/value pairs", )
+@optgroup.option("-r", "--reset", is_flag=True, help="Reset config.")
+@optgroup.option("-u", "--update-entry", metavar="ENTRY",
+                 help="Update an ENTRY in the config file.", type=str)
+def config(list, reset, update_entry):
     """Configure Zotnote from the command line.
     """
-    Configuration.create_config()
+    config = Configuration.load_config()
+
+    if list:
+        for k, v in config.items():
+            click.echo(f"{k}: {v}")
+    elif reset:
+        Configuration.create_config()
+    elif update_entry is not None:
+        if update_entry in config:
+            click.echo(f"Old value: {config[update_entry]}")
+            value = click.prompt("New value")
+            Configuration.update_config(update_entry, value)
+        else:
+            click.echo(f"{update_entry} is not a valid entry in the config.")
 
 
 @click.command()

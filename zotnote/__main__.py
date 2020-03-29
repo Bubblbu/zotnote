@@ -7,7 +7,7 @@ from .config import Configuration
 
 def main():
     # Check if all configuration files are in place
-    Configuration.check_files()
+    Configuration.validate()
 
     # Add commands to CLI
     cli.add_command(add)
