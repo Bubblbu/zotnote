@@ -10,7 +10,7 @@ from zotnote import config_dir, data_dir, project_dir
 
 class Configuration:
     """
-    Factory class to setup the project
+    A helper class to manage configurations
     """
     config_file = config_dir / "config.toml"
     templates_dir = data_dir / "templates"
