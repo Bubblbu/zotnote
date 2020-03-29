@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""
-API wrapper for Better Bibtex
-"""
 import requests
 import json
 
@@ -18,9 +15,8 @@ class BetterBibtexNotRunning(Exception):
 
 class BetterBibtex:
     """
-    Wrapper to accces the Better Bibtex search endpoints. Ensure that Zotero is running.
+    Wrapper class to access and manage BetterBibtex
     """
-
     BASE_URL = "http://localhost:23119/better-bibtex/"
 
     SEARCH_URL = BASE_URL + "json-rpc"
@@ -39,6 +35,8 @@ class BetterBibtex:
                 "Better Bibtex is not running. Please make sure to launch Zotero BBT")
 
     def probe_bbt(self):
+        """Check if Zotero & BBT are running
+        """
         r = requests.get(BetterBibtex.CAYW_URL + "?probe=probe")
         if r.text == "ready":
             return True
@@ -46,12 +44,14 @@ class BetterBibtex:
             return False
 
     def citation_picker(self):
+        """Launch the Zotero citation picker and return result.
+        """
         r = requests.get(BetterBibtex.CAYW_URL)
         return r.text
 
     def search_citekey_in_bbp(self, citekey):
         """
-        Searches the endpoint with the given search term (citekey).
+        Searches the endpoint with a citekey.
 
         Returns all candidates.
         """
