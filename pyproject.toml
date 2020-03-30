@@ -7,7 +7,7 @@ authors = [
 ]
 license = "MIT"
 packages = [
-    { include = "zotnote" }
+    { include = "zotnote", from="src" }
 ]
 include = ["templates/*"]
 
