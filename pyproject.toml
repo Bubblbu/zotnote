@@ -9,7 +9,11 @@ license = "MIT"
 packages = [
     { include = "zotnote", from="src" }
 ]
-include = ["templates/*"]
+
+include = [
+    "templates/*",
+    "config.toml.example"
+]
 
 keywords = ['zotero', 'literature-review', 'reading-notes']
 readme = 'README.md'
