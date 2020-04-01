@@ -5,14 +5,17 @@ from pathlib import Path
 import click
 from tomlkit import dumps, loads
 
-from zotnote import config_dir, data_dir, project_dir
+from zotnote import config_dir, data_dir, base_dir
 
 
 class Configuration:
     """A helper class to manage configurations"""
+    example_config = base_dir / "config.toml.example"
     config_file = config_dir / "config.toml"
+
+    pkg_templates_dir = base_dir / "notes/templates"
     templates_dir = data_dir / "templates"
-    pkg_templates_dir = project_dir / "templates"
+
 
     @classmethod
     def validate(cls):
@@ -61,7 +64,7 @@ class Configuration:
     @staticmethod
     def __new_config():
         """Load example configuration and populate interactively"""
-        exmpl_file = project_dir / "config.toml.example"
+        exmpl_file = base_dir / "config.toml.example"
         exmpl_config = loads(exmpl_file.read_text())
         config = exmpl_config
 

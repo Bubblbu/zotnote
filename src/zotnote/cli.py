@@ -10,7 +10,7 @@ from zotnote.connectors.bbt import (BetterBibtex, BetterBibtexException,
                                     BetterBibtexNotRunning)
 
 from .config import Configuration
-from .templates import MarkdownNote
+from .notes import Note
 from .utils import citekey_regex
 
 
@@ -28,7 +28,7 @@ def create_note(citekey, config, bbt, force):
         fieldValues = bbt.extract_fields(candidate)
 
         # Fill template
-    md = MarkdownNote(citekey, fieldValues, config)
+    md = Note(citekey, fieldValues, config)
 
     # Write output file
     notes_dir = Path(config['notes'])
