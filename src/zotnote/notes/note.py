@@ -10,7 +10,6 @@ This module manages notes.
 import datetime
 
 from jinja2 import Template
-
 from zotnote import data_dir
 
 
@@ -31,7 +30,7 @@ class Note:
         filein = data_dir / "templates/template.j2"
         self.__template = Template(filein.read_text())
 
-    def render_note(self, template=None):
+    def render(self, template=None):
         """Render note with template and save to disk."""
         if template is None:
             template = self.__template

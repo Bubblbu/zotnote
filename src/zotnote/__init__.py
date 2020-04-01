@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Some definitions for the whole package."""
 from pathlib import Path
 
 from xdg import XDG_CONFIG_HOME, XDG_DATA_HOME

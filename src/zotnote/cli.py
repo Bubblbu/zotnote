@@ -5,16 +5,12 @@ import sys
 from pathlib import Path
 
 import click
-from click_option_group import optgroup, RequiredMutuallyExclusiveOptionGroup
+from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
 
-from zotnote.connectors.bbt import (
-    BetterBibtex,
-    BetterBibtexNotRunning,
-)
-
-from .config import Configuration
-from .notes import Note
-from .utils import citekey_regex
+from .config.config import Configuration
+from .connectors.bbt import BetterBibtex, BetterBibtexNotRunning
+from .notes.note import Note
+from .utils.helpers import citekey_regex
 
 
 def create_note(citekey, config, bbt, force):
@@ -31,7 +27,7 @@ def create_note(citekey, config, bbt, force):
         fieldValues = bbt.extract_fields(candidate)
 
     # Fill template
-    md = Note(citekey, fieldValues, config)
+    note = Note(citekey, fieldValues, config)
 
     # Write output file
     notes_dir = Path(config["notes"])
@@ -40,7 +36,7 @@ def create_note(citekey, config, bbt, force):
     if outfile.exists():
         if force:
             click.echo(f"Overwriting {str(outfile)}")
-            outfile.write_text(str(note))
+            outfile.write_text(note.render())
         else:
             choice = click.confirm(
                 "This file already exists. Edit instead?"
@@ -50,7 +46,7 @@ def create_note(citekey, config, bbt, force):
                 os.system(f"{config['editor']} {str(outfile)}")
     else:
         click.echo(f"Writing {str(outfile)}")
-        outfile.write_text(str(note))
+        outfile.write_text(note.render())
 
 
 @click.command()

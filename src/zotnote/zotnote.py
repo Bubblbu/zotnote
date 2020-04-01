@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """Main module."""
-from zotnote.cli import cli
-from zotnote.cli import config, add, edit, remove
-from .config import Configuration
+from .cli import add, cli, config, edit, remove
+from .config.config import Configuration
 
 
 def main():
@@ -18,7 +17,7 @@ def main():
     # cli.add_command(report)
 
     # Launch CLI
-    cli(prog_name='zotnote')
+    cli()
 
 
 if __name__ == "__main__":

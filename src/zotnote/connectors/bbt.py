@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """This module contains code to interface with Better Bibtex."""
-import requests
 import json
 
-from zotnote.utils import prune_author_str
+import requests
+from zotnote.utils.helpers import prune_author_str
 
 
 class BetterBibtexNotRunning(Exception):

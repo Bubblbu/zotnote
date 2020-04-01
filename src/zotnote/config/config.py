@@ -4,18 +4,17 @@ import shutil
 
 import click
 from tomlkit import dumps, loads
-
-from zotnote import config_dir, data_dir, base_dir
+from zotnote import base_dir, config_dir, data_dir
 
 
 class Configuration:
     """A helper class to manage configuration."""
 
+    exmpl_cfg_file = base_dir / "config/config.toml.example"
     config_file = config_dir / "config.toml"
 
     pkg_templates_dir = base_dir / "notes/templates"
     templates_dir = data_dir / "templates"
-
 
     @classmethod
     def validate(cls):
@@ -40,12 +39,11 @@ class Configuration:
     @classmethod
     def load_config(cls):
         """Load configuration file."""
-
         return loads(cls.config_file.read_text())
 
     @classmethod
     def create_config(cls):
-        """Creates new configuration."""
+        """Create new configuration."""
         if cls.config_file.exists():
             ow = click.confirm(
                 "Do you really want to create a new config? "
@@ -59,15 +57,15 @@ class Configuration:
 
     @classmethod
     def update_config(cls, key, value):
+        """Update a single value in the config."""
         config = loads(cls.config_file.read_text())
         config[key] = value
         cls.config_file.write_text(dumps(config))
 
-    @staticmethod
-    def __new_config():
-        """Load example configuration and populate interactively"""
-        exmpl_file = base_dir / "config.toml.example"
-        exmpl_config = loads(exmpl_file.read_text())
+    @classmethod
+    def __new_config(cls):
+        """Load example configuration and populate interactively."""
+        exmpl_config = loads(cls.exmpl_cfg_file.read_text())
         config = exmpl_config
 
         config["name"] = click.prompt("Enter your name")
