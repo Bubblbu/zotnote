@@ -5,10 +5,12 @@ import sys
 from pathlib import Path
 
 import click
-from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
+from click_option_group import RequiredMutuallyExclusiveOptionGroup
+from click_option_group import optgroup
 
 from .config.config import Configuration
-from .connectors.bbt import BetterBibtex, BetterBibtexNotRunning
+from .connectors.bbt import BetterBibtex
+from .connectors.bbt import BetterBibtexNotRunning
 from .notes.note import Note
 from .utils.helpers import citekey_regex
 

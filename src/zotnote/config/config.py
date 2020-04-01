@@ -3,8 +3,11 @@
 import shutil
 
 import click
-from tomlkit import dumps, loads
-from zotnote import base_dir, config_dir, data_dir
+from tomlkit import dumps
+from tomlkit import loads
+from zotnote import base_dir
+from zotnote import config_dir
+from zotnote import data_dir
 
 
 class Configuration:

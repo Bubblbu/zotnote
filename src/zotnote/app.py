@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """This module is the main entry point for the app."""
-from .cli import add, cli, config, edit, remove
+from .cli import add
+from .cli import cli
+from .cli import config
+from .cli import edit
+from .cli import remove
 from .config.config import Configuration
 
 
