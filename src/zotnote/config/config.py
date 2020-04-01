@@ -76,7 +76,6 @@ class Configuration:
 
         config["editor"] = click.prompt("The command to execute your editor of choice")
 
-        config["zotero"] = click.prompt("Enter path to your Zotero directory")
         config["notes"] = click.prompt("Enter location for your notes")
         return config
 
