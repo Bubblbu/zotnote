@@ -13,7 +13,7 @@ Automatize and manage your reading notes with Zotero & Better Bibtex Plugin (BBT
 - Simple installation via pipx/pip
 - Full command-line interface to create, edit, and remove notes
 - Easy selection of entries with interactive Zotero citation picker
-- Templating for the reading notes ([Jinja2](https://jinja.palletsprojects.com/en/2.11.x/)) 
+- Templating for the reading notes ([Jinja2](https://jinja.palletsprojects.com/en/2.11.x/))
 
 *Planned features*
 
@@ -21,7 +21,7 @@ Automatize and manage your reading notes with Zotero & Better Bibtex Plugin (BBT
   - Retrieval of relevant quotes based on these tags and keywords
   - Analytics based on these tags and keywords
 - Enrich reading notes with more metadata from Zotero
-- Simple reports about progress of literature review 
+- Simple reports about progress of literature review
 - (*dreaming*) Automatically export collection of notes as an annotated bibliography.
 
 *Long-term vision*
@@ -57,7 +57,7 @@ pip install zotnote
 
 ### Option 3: Download from GitHub
 
-Download the latest release from Github and unzip. Put the folder containing the scripts into your `PATH`. 
+Download the latest release from Github and unzip. Put the folder containing the scripts into your `PATH`.
 
 Alternatively, run
 

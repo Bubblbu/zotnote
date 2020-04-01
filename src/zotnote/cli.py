@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
+"""The main CLI module."""
 import os
 import sys
 from pathlib import Path
 
 import click
-from click_option_group import optgroup, RequiredMutuallyExclusiveOptionGroup
+from click_option_group import RequiredMutuallyExclusiveOptionGroup
+from click_option_group import optgroup
 
-from zotnote.connectors.bbt import (BetterBibtex, BetterBibtexException,
-                                    BetterBibtexNotRunning)
+from .config.config import Configuration
+from .connectors.bbt import BetterBibtex
+from .connectors.bbt import BetterBibtexNotRunning
+from .notes.note import BadTemplateName
+from .notes.note import Note
+from .utils.helpers import citekey_regex
 
-from .config import Configuration
-from .notes import Note
-from .utils import citekey_regex
 
-
-def create_note(citekey, config, bbt, force):
+def create_note(citekey, config, bbt, force, template):
     """Create reading note for CITEKEY in your Zotero library."""
     candidates = bbt.search_citekey_in_bbp(citekey)
     if not candidates:
@@ -27,35 +29,52 @@ def create_note(citekey, config, bbt, force):
         candidate = candidates[0]
         fieldValues = bbt.extract_fields(candidate)
 
-        # Fill template
-    md = Note(citekey, fieldValues, config)
+    # Fill template
+    try:
+        note = Note(citekey, fieldValues, config, template)
+    except BadTemplateName as e:
+        click.echo(e)
+        sys.exit()
 
     # Write output file
-    notes_dir = Path(config['notes'])
+    notes_dir = Path(config["notes"])
     outfile = notes_dir / f"{citekey}.md"
 
     if outfile.exists():
         if force:
             click.echo(f"Overwriting {str(outfile)}")
-            outfile.write_text(str(md))
         else:
             choice = click.confirm(
-                'This file already exists. Edit instead?" Use --force to overwrite files.')
+                "This file already exists. Edit instead?"
+                "Use --force to overwrite files."
+            )
             if choice:
                 os.system(f"{config['editor']} {str(outfile)}")
     else:
         click.echo(f"Writing {str(outfile)}")
-        outfile.write_text(str(md))
+
+    # Write note
+    outfile.write_text(note.render())
 
 
 @click.command()
-@click.argument('citekey', required=False)
+@click.argument("citekey", required=False)
+@click.option(
+    "-t",
+    "--template",
+    default="simple",
+    help="Template for note layout",
+    metavar="TEMPLATE",
+)
 @click.option("-f", "--force", is_flag=True, help="Overwrite existing notes")
-def add(citekey, force):
+def add(citekey, force, template):
     """
     Create a new note. If no citekey is provided the Zotero picker is launched.
 
-    CITEKEY is the cite key created by BBT.
+    CITEKEY is the cite key created by Better Bibtex.
+    TEMPLATE is the type of the note created.
+
+    See `templates` command for more details.
     """
     config = Configuration.load_config()
 
@@ -76,11 +95,11 @@ def add(citekey, force):
             click.echo("No citation key provided.")
             sys.exit()
 
-    create_note(citekey, config, bbt, force)
+    create_note(citekey, config, bbt, force, template)
 
 
 @click.command()
-@click.argument('citekey', required=False)
+@click.argument("citekey", required=False)
 def edit(citekey):
     """
     Open a note in your editor of choice.
@@ -106,7 +125,7 @@ def edit(citekey):
             sys.exit()
 
     # Write output file
-    notes_dir = Path(config['notes'])
+    notes_dir = Path(config["notes"])
     outfile = notes_dir / f"{citekey}.md"
 
     if outfile.exists():
@@ -120,7 +139,7 @@ def edit(citekey):
 
 
 @click.command(help="Remove a note")
-@click.argument('citekey', required=False)
+@click.argument("citekey", required=False)
 def remove(citekey):
     """Remove a note.
 
@@ -145,7 +164,7 @@ def remove(citekey):
             sys.exit()
 
     # Write output file
-    notes_dir = Path(config['notes'])
+    notes_dir = Path(config["notes"])
     outfile = notes_dir / f"{citekey}.md"
 
     if outfile.exists():
@@ -159,15 +178,38 @@ def remove(citekey):
 
 
 @click.command()
-@optgroup("Edit configuration", cls=RequiredMutuallyExclusiveOptionGroup,
-          help="Interact with the configuration")
-@optgroup.option("-l", "--list", is_flag=True, help="List all config key/value pairs", )
+def templates():
+    """List all available templates for notes."""
+    config = Configuration.load_config()
+
+    templates = Note.list_all_templates(config)
+
+    for t in templates:
+        if t == "simple":
+            click.echo(f"{t} (default)")
+        else:
+            click.echo(t)
+
+
+@click.command()
+@optgroup(
+    "Edit configuration",
+    cls=RequiredMutuallyExclusiveOptionGroup,
+    help="Interact with the configuration",
+)
+@optgroup.option(
+    "-l", "--list", is_flag=True, help="List all config key/value pairs",
+)
 @optgroup.option("-r", "--reset", is_flag=True, help="Reset config.")
-@optgroup.option("-u", "--update-entry", metavar="ENTRY",
-                 help="Update an ENTRY in the config file.", type=str)
+@optgroup.option(
+    "-u",
+    "--update-entry",
+    metavar="ENTRY",
+    help="Update an ENTRY in the config file.",
+    type=str,
+)
 def config(list, reset, update_entry):
-    """Configure Zotnote from the command line.
-    """
+    """Configure Zotnote from the command line."""
     config = Configuration.load_config()
 
     if list:
@@ -186,12 +228,11 @@ def config(list, reset, update_entry):
 
 @click.command()
 def report():
-    """Create a small, basic report based on the notes.
-    """
+    """Create a small, basic report based on the notes."""
     NotImplemented
 
 
 @click.group()
 def cli():
-    """Automatize and manage your reading notes with Zotero & Better Bibtex Plugin (BBT)
-    """
+    """CLI for ZotNote."""
+    pass
