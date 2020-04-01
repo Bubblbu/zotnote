@@ -12,8 +12,8 @@ Automatize and manage your reading notes with Zotero & Better Bibtex Plugin (BBT
 
 - Simple installation via pipx/pip
 - Full command-line interface to create, edit, and remove notes
-- Easy selection of entries with interactive Zotero citation picker
-- Templating for the reading notes ([Jinja2](https://jinja.palletsprojects.com/en/2.11.x/))
+- Graphical interface to select a Zotero item
+- Support for various reading note templates
 
 *Planned features*
 
@@ -28,7 +28,7 @@ Automatize and manage your reading notes with Zotero & Better Bibtex Plugin (BBT
 
 A literature review suite that connects to Zotero & BBT. Management of reading notes, reading/writing analytics, and basic qualitative text analysis (export reports as HTML via Jupyter notebooks). Export of reading notes in different formats (e.g., annotated bibliography).
 
-You can find a roadmap for ZotNote [here](https://github.com/Bubblbu/zotnote/projects/1).
+You can find a roadmap for ZotNote [here](https://github.com/Bubblbu/zotnote/issues/7).
 
 ## Installation
 
@@ -41,19 +41,13 @@ You can find a roadmap for ZotNote [here](https://github.com/Bubblbu/zotnote/pro
 
 The recommended way to install ZotNote is using [pipx](https://pipxproject.github.io/pipx/). Pipx cleanly install the package in an isolated environment (clean uninstalls!) and automagically exposes the CLI-endpoints globally on your system.
 
-```bash
-pipx install zotnote
-
-```
-
+    pipx install zotnote
 
 ### Option 2: Install via pip
 
 However, you can also simply use pip. Please be aware of the Python version and environments you are using.
 
-```bash
-pip install zotnote
-```
+    pip install zotnote
 
 ### Option 3: Download from GitHub
 
@@ -61,21 +55,16 @@ Download the latest release from Github and unzip. Put the folder containing the
 
 Alternatively, run
 
-```bash
-[sudo] python3 setup.py install
-```
+
+    [sudo] python3 setup.py install
 
 or
 
-```bash
-python3 setup.py install --user
-```
+    python3 setup.py install --user
 
 ### Option 4: Git clone (for developers)
 
-```bash
-git clone git@github.com:Bubblbu/zotnote.git
-```
+    git clone git@github.com:Bubblbu/zotnote.git
 
 The project is being developed with [Poetry](https://python-poetry.org/) as a dependency manager.
 
@@ -83,20 +72,20 @@ More instructions will follow soon!
 
 ## Getting started
 
-```shell
+```
 Usage: zotnote [OPTIONS] COMMAND [ARGS]...
 
-  Automatize and manage your reading notes with Zotero & Better Bibtex
-  Plugin (BBT)
+  CLI for ZotNote.
 
 Options:
   --help  Show this message and exit.
 
 Commands:
-  add     Create a new note.
-  config  Configure Zotnote from the command line.
-  edit    Open a note in your editor of choice.
-  remove  Remove a note
+  add        Create a new note.
+  config     Configure Zotnote from the command line.
+  edit       Open a note in your editor of choice.
+  remove     Remove a note
+  templates  List all available templates for notes.
 ```
 
 ### Configuration
@@ -107,12 +96,29 @@ ZotNote currently asks you for:
 
 - A name which is used in all reading notes.
 - An email address
-- Path to your Zotero installation (not required anymore. To be removed soon)
 - A folder to store your reading notes
 
 ### Usage
 
-`zotnote add [citekey]` should be all you need to start creating your notes. If you don't provide a citekey ZotNote will launch the Zotero picker for you.
+Some basic use cases:
+
+Create a note with the graphical interface (Zotero picker)
+
+    zotnote add
+
+Create for specific citekey
+
+    zotnote add [citekey]
+
+Edit a note (with graphical picker)
+
+    zotnote edit
+
+or
+
+    zotnote edit [citekey]
+
+You can explore each command in detail by adding `--help`.
 
 ## Authors
 
