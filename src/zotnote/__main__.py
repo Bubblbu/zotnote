@@ -1,11 +1,12 @@
-#!/usr/bin/env python
-# # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+"""Main module."""
 from zotnote.cli import cli
-from zotnote.cli import config, add, report, edit, remove
+from zotnote.cli import config, add, edit, remove
 from .config import Configuration
 
 
 def main():
+    """Load config and launch CLI."""
     # Check if all configuration files are in place
     Configuration.validate()
 

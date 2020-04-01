@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+"""A module that manages all things config."""
 import shutil
-from pathlib import Path
 
 import click
 from tomlkit import dumps, loads
@@ -9,8 +9,8 @@ from zotnote import config_dir, data_dir, base_dir
 
 
 class Configuration:
-    """A helper class to manage configurations"""
-    example_config = base_dir / "config.toml.example"
+    """A helper class to manage configuration."""
+
     config_file = config_dir / "config.toml"
 
     pkg_templates_dir = base_dir / "notes/templates"
@@ -47,8 +47,10 @@ class Configuration:
     def create_config(cls):
         """Creates new configuration."""
         if cls.config_file.exists():
-            ow = click.confirm("Do you really want to create a new config? "
-                               "This will overwrite your existing config.")
+            ow = click.confirm(
+                "Do you really want to create a new config? "
+                "This will overwrite your existing config."
+            )
             if ow:
                 config = cls.__new_config()
         else:
@@ -68,8 +70,8 @@ class Configuration:
         exmpl_config = loads(exmpl_file.read_text())
         config = exmpl_config
 
-        config['name'] = click.prompt("Enter your name")
-        config['email'] = click.prompt("Enter your email")
+        config["name"] = click.prompt("Enter your name")
+        config["email"] = click.prompt("Enter your email")
 
         config["editor"] = click.prompt("The command to execute your editor of choice")
 

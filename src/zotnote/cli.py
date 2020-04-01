@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""The main CLI module."""
 import os
 import sys
 from pathlib import Path
@@ -6,8 +7,10 @@ from pathlib import Path
 import click
 from click_option_group import optgroup, RequiredMutuallyExclusiveOptionGroup
 
-from zotnote.connectors.bbt import (BetterBibtex, BetterBibtexException,
-                                    BetterBibtexNotRunning)
+from zotnote.connectors.bbt import (
+    BetterBibtex,
+    BetterBibtexNotRunning,
+)
 
 from .config import Configuration
 from .notes import Note
@@ -27,29 +30,31 @@ def create_note(citekey, config, bbt, force):
         candidate = candidates[0]
         fieldValues = bbt.extract_fields(candidate)
 
-        # Fill template
+    # Fill template
     md = Note(citekey, fieldValues, config)
 
     # Write output file
-    notes_dir = Path(config['notes'])
+    notes_dir = Path(config["notes"])
     outfile = notes_dir / f"{citekey}.md"
 
     if outfile.exists():
         if force:
             click.echo(f"Overwriting {str(outfile)}")
-            outfile.write_text(str(md))
+            outfile.write_text(str(note))
         else:
             choice = click.confirm(
-                'This file already exists. Edit instead?" Use --force to overwrite files.')
+                "This file already exists. Edit instead?"
+                "Use --force to overwrite files."
+            )
             if choice:
                 os.system(f"{config['editor']} {str(outfile)}")
     else:
         click.echo(f"Writing {str(outfile)}")
-        outfile.write_text(str(md))
+        outfile.write_text(str(note))
 
 
 @click.command()
-@click.argument('citekey', required=False)
+@click.argument("citekey", required=False)
 @click.option("-f", "--force", is_flag=True, help="Overwrite existing notes")
 def add(citekey, force):
     """
@@ -80,7 +85,7 @@ def add(citekey, force):
 
 
 @click.command()
-@click.argument('citekey', required=False)
+@click.argument("citekey", required=False)
 def edit(citekey):
     """
     Open a note in your editor of choice.
@@ -106,7 +111,7 @@ def edit(citekey):
             sys.exit()
 
     # Write output file
-    notes_dir = Path(config['notes'])
+    notes_dir = Path(config["notes"])
     outfile = notes_dir / f"{citekey}.md"
 
     if outfile.exists():
@@ -120,7 +125,7 @@ def edit(citekey):
 
 
 @click.command(help="Remove a note")
-@click.argument('citekey', required=False)
+@click.argument("citekey", required=False)
 def remove(citekey):
     """Remove a note.
 
@@ -145,7 +150,7 @@ def remove(citekey):
             sys.exit()
 
     # Write output file
-    notes_dir = Path(config['notes'])
+    notes_dir = Path(config["notes"])
     outfile = notes_dir / f"{citekey}.md"
 
     if outfile.exists():
@@ -159,15 +164,24 @@ def remove(citekey):
 
 
 @click.command()
-@optgroup("Edit configuration", cls=RequiredMutuallyExclusiveOptionGroup,
-          help="Interact with the configuration")
-@optgroup.option("-l", "--list", is_flag=True, help="List all config key/value pairs", )
+@optgroup(
+    "Edit configuration",
+    cls=RequiredMutuallyExclusiveOptionGroup,
+    help="Interact with the configuration",
+)
+@optgroup.option(
+    "-l", "--list", is_flag=True, help="List all config key/value pairs",
+)
 @optgroup.option("-r", "--reset", is_flag=True, help="Reset config.")
-@optgroup.option("-u", "--update-entry", metavar="ENTRY",
-                 help="Update an ENTRY in the config file.", type=str)
+@optgroup.option(
+    "-u",
+    "--update-entry",
+    metavar="ENTRY",
+    help="Update an ENTRY in the config file.",
+    type=str,
+)
 def config(list, reset, update_entry):
-    """Configure Zotnote from the command line.
-    """
+    """Configure Zotnote from the command line."""
     config = Configuration.load_config()
 
     if list:
@@ -186,12 +200,11 @@ def config(list, reset, update_entry):
 
 @click.command()
 def report():
-    """Create a small, basic report based on the notes.
-    """
+    """Create a small, basic report based on the notes."""
     NotImplemented
 
 
 @click.group()
 def cli():
-    """Automatize and manage your reading notes with Zotero & Better Bibtex Plugin (BBT)
-    """
+    """CLI for ZotNote."""
+    pass
