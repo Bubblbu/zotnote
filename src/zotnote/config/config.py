@@ -1,43 +1,27 @@
 # -*- coding: utf-8 -*-
 """A module that manages all things config."""
-import shutil
 
 import click
 from tomlkit import dumps
 from tomlkit import loads
-from zotnote import base_dir
+from zotnote import ROOT
 from zotnote import config_dir
-from zotnote import data_dir
 
 
 class Configuration:
     """A helper class to manage configuration."""
 
-    exmpl_cfg_file = base_dir / "config/config.toml.example"
+    exmpl_cfg_file = ROOT / "config/config.toml.example"
     config_file = config_dir / "config.toml"
-
-    pkg_templates_dir = base_dir / "notes/templates"
-    templates_dir = data_dir / "templates"
 
     @classmethod
     def validate(cls):
         """Validate local configuration & create missing folders and files."""
+        # Make sure the config file is placed in XDG_CONFIG_HOME
         if not cls.config_file.exists():
             click.echo("Missing configuration file. Proceeding to create a new one.")
             cls.__create_dir(config_dir)
             cls.create_config()
-
-        if not cls.templates_dir.exists():
-            click.echo("App data missing. Proceeding to copy templates.")
-            cls.__create_dir(cls.templates_dir)
-            cls.__copy_templates()
-
-        pkg_templates = len(list(cls.pkg_templates_dir.glob("*.j2")))
-        lc_templates = len(list(cls.templates_dir.glob("*.j2")))
-
-        if lc_templates < pkg_templates:
-            click.echo("Template files are missing in app data. Copying...")
-            cls.__copy_templates()
 
     @classmethod
     def load_config(cls):
@@ -84,9 +68,3 @@ class Configuration:
         """Create directory if missing."""
         if not dir.exists():
             dir.mkdir(parents=True)
-
-    @classmethod
-    def __copy_templates(cls):
-        """Copy template files to the data directory."""
-        for f in cls.pkg_templates_dir.glob("*.j2"):
-            shutil.copyfile(f, cls.templates_dir / f.name)

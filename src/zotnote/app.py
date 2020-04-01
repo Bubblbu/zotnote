@@ -5,6 +5,7 @@ from .cli import cli
 from .cli import config
 from .cli import edit
 from .cli import remove
+from .cli import templates
 from .config.config import Configuration
 
 
@@ -18,6 +19,7 @@ def main():
     cli.add_command(config)
     cli.add_command(edit)
     cli.add_command(remove)
+    cli.add_command(templates)
     # cli.add_command(report)
 
     # Launch CLI

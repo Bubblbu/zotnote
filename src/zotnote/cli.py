@@ -11,11 +11,12 @@ from click_option_group import optgroup
 from .config.config import Configuration
 from .connectors.bbt import BetterBibtex
 from .connectors.bbt import BetterBibtexNotRunning
+from .notes.note import BadTemplateName
 from .notes.note import Note
 from .utils.helpers import citekey_regex
 
 
-def create_note(citekey, config, bbt, force):
+def create_note(citekey, config, bbt, force, template):
     """Create reading note for CITEKEY in your Zotero library."""
     candidates = bbt.search_citekey_in_bbp(citekey)
     if not candidates:
@@ -29,7 +30,11 @@ def create_note(citekey, config, bbt, force):
         fieldValues = bbt.extract_fields(candidate)
 
     # Fill template
-    note = Note(citekey, fieldValues, config)
+    try:
+        note = Note(citekey, fieldValues, config, template)
+    except BadTemplateName as e:
+        click.echo(e)
+        sys.exit()
 
     # Write output file
     notes_dir = Path(config["notes"])
@@ -38,7 +43,6 @@ def create_note(citekey, config, bbt, force):
     if outfile.exists():
         if force:
             click.echo(f"Overwriting {str(outfile)}")
-            outfile.write_text(note.render())
         else:
             choice = click.confirm(
                 "This file already exists. Edit instead?"
@@ -48,17 +52,29 @@ def create_note(citekey, config, bbt, force):
                 os.system(f"{config['editor']} {str(outfile)}")
     else:
         click.echo(f"Writing {str(outfile)}")
-        outfile.write_text(note.render())
+
+    # Write note
+    outfile.write_text(note.render())
 
 
 @click.command()
 @click.argument("citekey", required=False)
+@click.option(
+    "-t",
+    "--template",
+    default="simple",
+    help="Template for note layout",
+    metavar="TEMPLATE",
+)
 @click.option("-f", "--force", is_flag=True, help="Overwrite existing notes")
-def add(citekey, force):
+def add(citekey, force, template):
     """
     Create a new note. If no citekey is provided the Zotero picker is launched.
 
-    CITEKEY is the cite key created by BBT.
+    CITEKEY is the cite key created by Better Bibtex.
+    TEMPLATE is the type of the note created.
+
+    See `templates` command for more details.
     """
     config = Configuration.load_config()
 
@@ -79,7 +95,7 @@ def add(citekey, force):
             click.echo("No citation key provided.")
             sys.exit()
 
-    create_note(citekey, config, bbt, force)
+    create_note(citekey, config, bbt, force, template)
 
 
 @click.command()
@@ -159,6 +175,20 @@ def remove(citekey):
             sys.exit()
     else:
         click.echo("This note does not exist.")
+
+
+@click.command()
+def templates():
+    """List all available templates for notes."""
+    config = Configuration.load_config()
+
+    templates = Note.list_all_templates(config)
+
+    for t in templates:
+        if t == "simple":
+            click.echo(f"{t} (default)")
+        else:
+            click.echo(t)
 
 
 @click.command()
