@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Main module."""
+"""This module is the main entry point for the app."""
 from .cli import add, cli, config, edit, remove
 from .config.config import Configuration
 
@@ -17,8 +17,4 @@ def main():
     # cli.add_command(report)
 
     # Launch CLI
-    cli()
-
-
-if __name__ == "__main__":
-    main()
+    cli(prog_name="zotnote")

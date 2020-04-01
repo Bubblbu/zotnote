@@ -15,8 +15,8 @@ readme = 'README.md'
 repository = "https://github.com/bubblbu/zotnote"
 homepage = "https://github.com/bubblbu/zotnote"
 
-[tool.poetry.plugins."console_scripts"]
-"zotnote" = "zotnote.zotnote:main"
+[tool.poetry.scripts]
+zotnote = "zotnote.application:main"
 
 [tool.poetry.dependencies]
 python = "^3.6"
