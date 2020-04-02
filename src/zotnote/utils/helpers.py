@@ -3,7 +3,7 @@
 
 import re
 
-citekey_regex = re.compile(r"^[a-z0-9]+_[a-z0-9]+_[a-z0-9]+$")
+citekey_regex = re.compile(r"^[a-zA-Z0-9_-]+$")
 
 
 def prune_author_str(author_str, maxlen):
