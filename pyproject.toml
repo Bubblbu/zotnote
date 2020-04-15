@@ -16,7 +16,7 @@ repository = "https://github.com/bubblbu/zotnote"
 homepage = "https://github.com/bubblbu/zotnote"
 
 [tool.poetry.scripts]
-zotnote = "zotnote.application:main"
+zotnote = "zotnote.app:main"
 
 [tool.poetry.dependencies]
 python = "^3.6"
