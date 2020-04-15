@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zotnote"
-version = "0.3.4"
+version = "0.3.5"
 description = "Streamlining reading notes with Zotero"
 authors = [
     "Asura Enkhbayar <asura.enkhbayar@gmail.com>"
@@ -16,7 +16,7 @@ repository = "https://github.com/bubblbu/zotnote"
 homepage = "https://github.com/bubblbu/zotnote"
 
 [tool.poetry.scripts]
-zotnote = "zotnote.application:main"
+zotnote = "zotnote.app:main"
 
 [tool.poetry.dependencies]
 python = "^3.6"
