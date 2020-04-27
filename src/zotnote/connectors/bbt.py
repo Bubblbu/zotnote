@@ -31,8 +31,6 @@ class BetterBibtex:
         }
         self.payload = [{"jsonrpc": "2.0", "method": "item.search", "params": None}]
 
-        self.selected_fields = ["title", "DOI", "type", "issued", "author"]
-
         self.author_str_len = 60
 
         if not self.probe_bbt():
@@ -66,15 +64,16 @@ class BetterBibtex:
         else:
             return None
 
-    def extract_fields(self, candidate):
+    def extract_fields(self, candidate, selected_fields):
         """
         Pretty simple function that retrieves the article information.
 
         Returns a dict defined by selected fields.
         """
-        article = {f: None for f in self.selected_fields}
+        selected_fields = ["title", "DOI", "type", "issued", "author"]
+        article = {f: None for f in selected_fields}
 
-        for f in self.selected_fields:
+        for f in selected_fields:
             if f in candidate:
                 if f == "author":
                     author_str = []
