@@ -18,7 +18,7 @@ from .utils.helpers import citekey_regex
 
 def create_note(citekey, config, bbt, force, template):
     """Create reading note for CITEKEY in your Zotero library."""
-    candidates = bbt.search_citekey_in_bbp(citekey)
+    candidates = bbt.search(citekey)
     if not candidates:
         click.echo("No results found for " + citekey)
         sys.exit()
