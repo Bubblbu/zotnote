@@ -5,9 +5,26 @@ import json
 import requests
 from zotnote.utils.helpers import prune_author_str
 
+SEARCH = "items.search"
+BIBLIOGRAPHY = "items.bibliography"
+NOTES = "items.notes"
+ATTACHEMENTS = "items.attachements"
+
 
 class BetterBibtexNotRunning(Exception):
     """This error is thrown when BBT is not running."""
+
+    pass
+
+
+class BetterBibtexSearchError(Exception):
+    """This error is thrown when something fails during the request."""
+
+    pass
+
+
+class BetterBibtexBadRequest(Exception):
+    """This error is thrown when BBT detects a bad request."""
 
     pass
 
@@ -16,7 +33,6 @@ class BetterBibtex:
     """Wrapper class to access and manage BetterBibtex."""
 
     BASE_URL = "http://localhost:23119/better-bibtex/"
-
     SEARCH_URL = BASE_URL + "json-rpc"
     CAYW_URL = BASE_URL + "cayw"
 
@@ -29,9 +45,7 @@ class BetterBibtex:
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
-        self.payload = [{"jsonrpc": "2.0", "method": "item.search", "params": None}]
-
-        self.author_str_len = 60
+        self.payload = {"jsonrpc": "2.0", "method": None, "params": None}
 
         if not self.probe_bbt():
             raise BetterBibtexNotRunning(
@@ -51,26 +65,63 @@ class BetterBibtex:
         r = requests.get(BetterBibtex.CAYW_URL)
         return r.text
 
-    def search_citekey_in_bbp(self, citekey):
+    # JSON-RPC API endpoints
+    def search(self, citekey):
         """Search the endpoint with a citekey. Returns all candidates."""
         payload = self.payload
-        payload[0]["params"] = [f"{citekey}"]
-        payload = json.dumps(payload)
+        payload["method"] = "item.search"
+        payload["params"] = [f"{citekey}"]
+        payload = json.dumps([payload])
 
-        r = requests.post(BetterBibtex.SEARCH_URL, data=payload, headers=self.headers)
+        try:
+            r = requests.post(
+                BetterBibtex.SEARCH_URL, data=payload, headers=self.headers
+            )
+        except ConnectionError:
+            raise BetterBibtexNotRunning("Are you sure that Zotero is running?")
+
         if r.status_code == 200:
-            candidates = r.json()[0]["result"]
-            return candidates
+            r = r.json()[0]
+            if "error" in r:
+                raise BetterBibtexBadRequest(r["error"])
+            else:
+                return r["result"]
         else:
-            return None
+            raise BetterBibtexSearchError(
+                "Request returned with status code: " + r.status_code
+            )
 
-    def extract_fields(self, candidate, selected_fields):
+    def bibliography(self, citekey):
+        """Retrieve bibliographic entry for citekey."""
+        payload = self.payload
+        payload["metod"] = "item.bibliography"
+        payload["params"] = [f"{citekey}"]
+        payload = json.dumps([payload])
+
+    def notes(self, citekey):
+        """Retrieve bibliographic entry for citekey."""
+        payload = self.payload
+        payload["metod"] = "item.notes"
+        payload["params"] = [f"{citekey}"]
+        payload = json.dumps([payload])
+
+    @staticmethod
+    def select_candidate(candidates):
+        NotImplemented
+
+    @staticmethod
+    def extract_fields(candidate, selected_fields):
         """
         Pretty simple function that retrieves the article information.
 
         Returns a dict defined by selected fields.
+
+        This one should probably be exported to its own class representing
+        articles in an intermediate stage.
         """
         selected_fields = ["title", "DOI", "type", "issued", "author"]
+        author_str_len = 60
+
         article = {f: None for f in selected_fields}
 
         for f in selected_fields:
@@ -81,8 +132,8 @@ class BetterBibtex:
                         name_str = f"{name['family']}, {name['given']}"
                         author_str.append(name_str)
                     author_str = "; ".join(author_str)
-                    if len(author_str) >= self.author_str_len:
-                        author_str = prune_author_str(author_str, self.author_str_len)
+                    if len(author_str) >= author_str_len:
+                        author_str = prune_author_str(author_str, author_str_len)
                     article[f] = author_str
                 elif f == "issued":
                     year = candidate[f]["date-parts"][0][0]
