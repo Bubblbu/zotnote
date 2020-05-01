@@ -9,6 +9,7 @@ from click_option_group import RequiredMutuallyExclusiveOptionGroup
 from click_option_group import optgroup
 
 from .config.config import Configuration
+from .config.config import config
 from .connectors.bbt import BetterBibtex
 from .connectors.bbt import BetterBibtexNotRunning
 from .notes.note import BadTemplateName
@@ -16,18 +17,9 @@ from .notes.note import Note
 from .utils.helpers import citekey_regex
 
 
-def create_note(citekey, config, bbt, force, template):
+def create_note(fieldValues, force, template):
     """Create reading note for CITEKEY in your Zotero library."""
-    candidates = bbt.search_citekey_in_bbp(citekey)
-    if not candidates:
-        click.echo("No results found for " + citekey)
-        sys.exit()
-    elif len(candidates) != 1:
-        click.echo("Something wrong happened here. We have too many candidates...")
-        sys.exit()
-    else:
-        candidate = candidates[0]
-        fieldValues = bbt.extract_fields(candidate)
+    citekey = fieldValues["citekey"]
 
     # Fill template
     try:
@@ -45,7 +37,7 @@ def create_note(citekey, config, bbt, force, template):
             click.echo(f"Overwriting {str(outfile)}")
         else:
             choice = click.confirm(
-                "This file already exists. Edit instead?"
+                "This file already exists. Edit instead? "
                 "Use --force to overwrite files."
             )
             if choice:
@@ -57,8 +49,29 @@ def create_note(citekey, config, bbt, force, template):
     outfile.write_text(note.render())
 
 
+def process_citekey(citekey):
+    """Process citekey and retrieve note."""
+    match = citekey_regex.match(citekey)
+    if match is None:
+        click.echo("The citekey provided is not valid")
+        sys.exit()
+
+    try:
+        bbt = BetterBibtex()
+    except BetterBibtexNotRunning as e:
+        click.echo(e)
+        sys.exit()
+
+    candidate = bbt.search(citekey)
+    if not candidate:
+        sys.exit()
+    return bbt.extract_fields(candidate)
+
+
 @click.command()
-@click.argument("citekey", required=False)
+@click.argument(
+    "citekey", required=True, default=lambda: BetterBibtex.citation_picker()
+)
 @click.option(
     "-t",
     "--template",
@@ -76,96 +89,69 @@ def add(citekey, force, template):
 
     See `templates` command for more details.
     """
-    config = Configuration.load_config()
-
-    try:
-        bbt = BetterBibtex(config)
-    except BetterBibtexNotRunning as e:
-        click.echo(e)
+    if not citekey:
+        click.echo("No citation key provided.")
         sys.exit()
 
-    if citekey:
-        match = citekey_regex.match(citekey)
-        if match is None:
-            click.echo("The citekey provided is not valid")
-            sys.exit()
-    else:
-        citekey = bbt.citation_picker()
-        if citekey is None:
-            click.echo("No citation key provided.")
-            sys.exit()
-
-    create_note(citekey, config, bbt, force, template)
+    fieldValues = process_citekey(citekey)
+    create_note(fieldValues, force, template)
 
 
 @click.command()
-@click.argument("citekey", required=False)
-def edit(citekey):
+@click.argument(
+    "citekey", required=True, default=lambda: BetterBibtex.citation_picker()
+)
+@click.option(
+    "-t",
+    "--template",
+    default="simple",
+    help="Template for note layout",
+    metavar="TEMPLATE",
+)
+@click.option("-f", "--force", is_flag=True, help="Overwrite existing notes")
+def edit(citekey, force, template):
     """
     Open a note in your editor of choice.
 
     CITEKEY is the cite key created by BBT.
     """
-    config = Configuration.load_config()
-
-    try:
-        bbt = BetterBibtex(config)
-    except BetterBibtexNotRunning as e:
-        click.echo(e)
+    if not citekey:
+        click.echo("No citation key provided.")
         sys.exit()
 
-    if citekey:
-        match = citekey_regex.match(citekey)
-        if match is None:
-            click.echo("The citekey provided is not valid")
-            sys.exit()
-    else:
-        citekey = bbt.citation_picker()
-        if citekey is None:
-            sys.exit()
+    fieldValues = process_citekey(citekey)
 
-    # Write output file
+    # If file doesn't exist, offer to create note
     notes_dir = Path(config["notes"])
-    outfile = notes_dir / f"{citekey}.md"
-
+    outfile = notes_dir / f"{fieldValues['citekey']}.md"
     if outfile.exists():
         os.system(f"{config['editor']} {str(outfile)}")
     else:
         choice = click.confirm("File does not exist yet. Create now?")
         if choice:
-            create_note(citekey, config)
+            create_note(fieldValues, force, template)
         else:
             sys.exit()
 
 
 @click.command(help="Remove a note")
-@click.argument("citekey", required=False)
+@click.argument(
+    "citekey", required=True, default=lambda: BetterBibtex.citation_picker()
+)
 def remove(citekey):
     """Remove a note.
 
     CITEKEY is the cite key created by BBT.
     """
-    config = Configuration.load_config()
-
-    try:
-        bbt = BetterBibtex(config)
-    except BetterBibtexNotRunning as e:
-        click.echo(e)
+    if not citekey:
+        click.echo("No citation key provided.")
         sys.exit()
 
-    if citekey:
-        match = citekey_regex.match(citekey)
-        if match is None:
-            click.echo("The citekey provided is not valid")
-            sys.exit()
-    else:
-        citekey = bbt.citation_picker()
-        if citekey is None:
-            sys.exit()
+    fieldValues = process_citekey(citekey)
 
     # Write output file
     notes_dir = Path(config["notes"])
-    outfile = notes_dir / f"{citekey}.md"
+    outfile = notes_dir / f"{fieldValues['citekey']}.md"
 
     if outfile.exists():
         choice = click.confirm("Are you sure you want to delete this note?")
@@ -180,8 +166,6 @@ def remove(citekey):
 @click.command()
 def templates():
     """List all available templates for notes."""
-    config = Configuration.load_config()
-
     templates = Note.list_all_templates(config)
 
     for t in templates:
@@ -208,10 +192,8 @@ def templates():
     help="Update an ENTRY in the config file.",
     type=str,
 )
-def config(list, reset, update_entry):
+def configurate(list, reset, update_entry):
     """Configure Zotnote from the command line."""
-    config = Configuration.load_config()
-
     if list:
         for k, v in config.items():
             click.echo(f"{k}: {v}")

@@ -11,7 +11,7 @@ import datetime
 from pathlib import Path
 
 from jinja2 import Template
-from zotnote import ROOT
+from zotnote import base_dir
 
 
 class BadTemplateName(Exception):
@@ -23,7 +23,7 @@ class BadTemplateName(Exception):
 class Note:
     """The Note class."""
 
-    templates_dir = ROOT / "notes/templates"
+    templates_dir = base_dir / "notes/templates"
     content_dir = templates_dir / "content"
 
     # Load the master template
@@ -87,6 +87,7 @@ class Note:
 
     @classmethod
     def list_all_templates(cls, config):
+        """List all available templates."""
         notes_dir = Path(config["notes"])
         user_templates = notes_dir / "templates"
 

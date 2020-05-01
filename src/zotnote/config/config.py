@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 """A module that manages all things config."""
-
 import click
 from tomlkit import dumps
 from tomlkit import loads
-from zotnote import ROOT
+from zotnote import base_dir
 from zotnote import config_dir
 
 
 class Configuration:
     """A helper class to manage configuration."""
 
-    exmpl_cfg_file = ROOT / "config/config.toml.example"
+    exmpl_cfg_file = base_dir / "config/config.toml.example"
     config_file = config_dir / "config.toml"
 
     @classmethod
@@ -68,3 +67,6 @@ class Configuration:
         """Create directory if missing."""
         if not dir.exists():
             dir.mkdir(parents=True)
+
+
+config = Configuration.load_config()
