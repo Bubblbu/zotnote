@@ -9,6 +9,7 @@ from click_option_group import RequiredMutuallyExclusiveOptionGroup
 from click_option_group import optgroup
 
 from .config.config import Configuration
+from .config.config import config
 from .connectors.bbt import BetterBibtex
 from .connectors.bbt import BetterBibtexNotRunning
 from .notes.note import BadTemplateName
@@ -16,10 +17,9 @@ from .notes.note import Note
 from .utils.helpers import citekey_regex
 
 
-def create_note(citekey, config, bbt, force, template):
+def create_note(fieldValues, force, template):
     """Create reading note for CITEKEY in your Zotero library."""
-    candidate = bbt.search(citekey)
-    fieldValues = bbt.extract_fields(candidate)
+    citekey = fieldValues["citekey"]
 
     # Fill template
     try:
@@ -37,7 +37,7 @@ def create_note(citekey, config, bbt, force, template):
             click.echo(f"Overwriting {str(outfile)}")
         else:
             choice = click.confirm(
-                "This file already exists. Edit instead?"
+                "This file already exists. Edit instead? "
                 "Use --force to overwrite files."
             )
             if choice:
@@ -135,7 +135,9 @@ def edit(citekey, force, template):
 
 
 @click.command(help="Remove a note")
-@click.argument("citekey", required=False)
+@click.argument(
+    "citekey", required=True, default=lambda: BetterBibtex.citation_picker()
+)
 def remove(citekey):
     """Remove a note.
 
@@ -164,8 +166,6 @@ def remove(citekey):
 @click.command()
 def templates():
     """List all available templates for notes."""
-    config = Configuration.load_config()
-
     templates = Note.list_all_templates(config)
 
     for t in templates:
@@ -192,10 +192,8 @@ def templates():
     help="Update an ENTRY in the config file.",
     type=str,
 )
-def config(list, reset, update_entry):
+def configurate(list, reset, update_entry):
     """Configure Zotnote from the command line."""
-    config = Configuration.load_config()
-
     if list:
         for k, v in config.items():
             click.echo(f"{k}: {v}")

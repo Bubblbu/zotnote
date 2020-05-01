@@ -191,7 +191,7 @@ class BetterBibtex:
         This one should probably be exported to its own class representing
         articles in an intermediate stage.
         """
-        selected_fields = ["title", "DOI", "type", "issued", "author"]
+        selected_fields = ["title", "DOI", "type", "issued", "author", "citekey", "id"]
         author_str_len = 60
 
         article = {f: None for f in selected_fields}

@@ -2,7 +2,7 @@
 """This module is the main entry point for the app."""
 from .cli import add
 from .cli import cli
-from .cli import config
+from .cli import configurate
 from .cli import edit
 from .cli import remove
 from .cli import templates
@@ -16,7 +16,7 @@ def main():
 
     # Add commands to CLI
     cli.add_command(add)
-    cli.add_command(config)
+    cli.add_command(configurate)
     cli.add_command(edit)
     cli.add_command(remove)
     cli.add_command(templates)
