@@ -18,16 +18,8 @@ from .utils.helpers import citekey_regex
 
 def create_note(citekey, config, bbt, force, template):
     """Create reading note for CITEKEY in your Zotero library."""
-    candidates = bbt.search(citekey)
-    if not candidates:
-        click.echo("No results found for " + citekey)
-        sys.exit()
-    elif len(candidates) != 1:
-        click.echo("Something wrong happened here. We have too many candidates...")
-        sys.exit()
-    else:
-        candidate = candidates[0]
-        fieldValues = bbt.extract_fields(candidate)
+    candidate = bbt.search(citekey)
+    fieldValues = bbt.extract_fields(candidate)
 
     # Fill template
     try:
@@ -79,7 +71,7 @@ def add(citekey, force, template):
     config = Configuration.load_config()
 
     try:
-        bbt = BetterBibtex(config)
+        bbt = BetterBibtex()
     except BetterBibtexNotRunning as e:
         click.echo(e)
         sys.exit()
@@ -100,7 +92,15 @@ def add(citekey, force, template):
 
 @click.command()
 @click.argument("citekey", required=False)
-def edit(citekey):
+@click.option(
+    "-t",
+    "--template",
+    default="simple",
+    help="Template for note layout",
+    metavar="TEMPLATE",
+)
+@click.option("-f", "--force", is_flag=True, help="Overwrite existing notes")
+def edit(citekey, force, template):
     """
     Open a note in your editor of choice.
 
@@ -109,7 +109,7 @@ def edit(citekey):
     config = Configuration.load_config()
 
     try:
-        bbt = BetterBibtex(config)
+        bbt = BetterBibtex()
     except BetterBibtexNotRunning as e:
         click.echo(e)
         sys.exit()
@@ -124,16 +124,15 @@ def edit(citekey):
         if citekey is None:
             sys.exit()
 
-    # Write output file
+    # If file doesn't exist, offer to create note
     notes_dir = Path(config["notes"])
     outfile = notes_dir / f"{citekey}.md"
-
     if outfile.exists():
         os.system(f"{config['editor']} {str(outfile)}")
     else:
         choice = click.confirm("File does not exist yet. Create now?")
         if choice:
-            create_note(citekey, config)
+            create_note(citekey, config, bbt, force, template)
         else:
             sys.exit()
 
@@ -148,7 +147,7 @@ def remove(citekey):
     config = Configuration.load_config()
 
     try:
-        bbt = BetterBibtex(config)
+        bbt = BetterBibtex()
     except BetterBibtexNotRunning as e:
         click.echo(e)
         sys.exit()
