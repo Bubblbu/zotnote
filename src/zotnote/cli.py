@@ -49,6 +49,25 @@ def create_note(citekey, config, bbt, force, template):
     outfile.write_text(note.render())
 
 
+def process_citekey(citekey):
+    """Process citekey and retrieve note."""
+    match = citekey_regex.match(citekey)
+    if match is None:
+        click.echo("The citekey provided is not valid")
+        sys.exit()
+
+    try:
+        bbt = BetterBibtex()
+    except BetterBibtexNotRunning as e:
+        click.echo(e)
+        sys.exit()
+
+    candidate = bbt.search(citekey)
+    if not candidate:
+        sys.exit()
+    return bbt.extract_fields(candidate)
+
+
 @click.command()
 @click.argument(
     "citekey", required=True, default=lambda: BetterBibtex.citation_picker()
@@ -74,27 +93,8 @@ def add(citekey, force, template):
         click.echo("No citation key provided.")
         sys.exit()
 
-    match = citekey_regex.match(citekey)
-    if match is None:
-        click.echo("The citekey provided is not valid")
-        sys.exit()
-
-    try:
-        bbt = BetterBibtex()
-    except BetterBibtexNotRunning as e:
-        click.echo(e)
-        sys.exit()
-
-    candidate = bbt.search(citekey)
-    if not candidate:
-        sys.exit()
-    else:
-        citekey = bbt.citation_picker()
-        if citekey is None:
-            click.echo("No citation key provided.")
-            sys.exit()
-
-    create_note(citekey, config, bbt, force, template)
+    fieldValues = process_citekey(citekey)
+    create_note(fieldValues, force, template)
 
 
 @click.command()
@@ -119,30 +119,17 @@ def edit(citekey, force, template):
         click.echo("No citation key provided.")
         sys.exit()
 
-    match = citekey_regex.match(citekey)
-    if match is None:
-        click.echo("The citekey provided is not valid")
-        sys.exit()
-
-    try:
-        bbt = BetterBibtex()
-    except BetterBibtexNotRunning as e:
-        click.echo(e)
-        sys.exit()
-
-    candidate = bbt.search(citekey)
-    if not candidate:
-        sys.exit()
+    fieldValues = process_citekey(citekey)
 
     # If file doesn't exist, offer to create note
     notes_dir = Path(config["notes"])
-    outfile = notes_dir / f"{citekey}.md"
+    outfile = notes_dir / f"{fieldValues['citekey']}.md"
     if outfile.exists():
         os.system(f"{config['editor']} {str(outfile)}")
     else:
         choice = click.confirm("File does not exist yet. Create now?")
         if choice:
-            create_note(citekey, config, bbt, force, template)
+            create_note(fieldValues, force, template)
         else:
             sys.exit()
 
@@ -158,21 +145,7 @@ def remove(citekey):
         click.echo("No citation key provided.")
         sys.exit()
 
-    match = citekey_regex.match(citekey)
-    if match is None:
-        click.echo("The citekey provided is not valid")
-        sys.exit()
-
-    try:
-        bbt = BetterBibtex()
-    except BetterBibtexNotRunning as e:
-        click.echo(e)
-        sys.exit()
-
-    candidate = bbt.search(citekey)
-    if not candidate:
-        sys.exit()
-    fieldValues = bbt.extract_fields(candidate)
+    fieldValues = process_citekey(citekey)
 
     # Write output file
     notes_dir = Path(config["notes"])
