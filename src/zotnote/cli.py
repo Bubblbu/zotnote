@@ -50,7 +50,9 @@ def create_note(citekey, config, bbt, force, template):
 
 
 @click.command()
-@click.argument("citekey", required=False)
+@click.argument(
+    "citekey", required=True, default=lambda: BetterBibtex.citation_picker()
+)
 @click.option(
     "-t",
     "--template",
@@ -68,7 +70,14 @@ def add(citekey, force, template):
 
     See `templates` command for more details.
     """
-    config = Configuration.load_config()
+    if not citekey:
+        click.echo("No citation key provided.")
+        sys.exit()
+
+    match = citekey_regex.match(citekey)
+    if match is None:
+        click.echo("The citekey provided is not valid")
+        sys.exit()
 
     try:
         bbt = BetterBibtex()
@@ -76,11 +85,9 @@ def add(citekey, force, template):
         click.echo(e)
         sys.exit()
 
-    if citekey:
-        match = citekey_regex.match(citekey)
-        if match is None:
-            click.echo("The citekey provided is not valid")
-            sys.exit()
+    candidate = bbt.search(citekey)
+    if not candidate:
+        sys.exit()
     else:
         citekey = bbt.citation_picker()
         if citekey is None:
@@ -91,7 +98,9 @@ def add(citekey, force, template):
 
 
 @click.command()
-@click.argument("citekey", required=False)
+@click.argument(
+    "citekey", required=True, default=lambda: BetterBibtex.citation_picker()
+)
 @click.option(
     "-t",
     "--template",
@@ -106,7 +115,14 @@ def edit(citekey, force, template):
 
     CITEKEY is the cite key created by BBT.
     """
-    config = Configuration.load_config()
+    if not citekey:
+        click.echo("No citation key provided.")
+        sys.exit()
+
+    match = citekey_regex.match(citekey)
+    if match is None:
+        click.echo("The citekey provided is not valid")
+        sys.exit()
 
     try:
         bbt = BetterBibtex()
@@ -114,15 +130,9 @@ def edit(citekey, force, template):
         click.echo(e)
         sys.exit()
 
-    if citekey:
-        match = citekey_regex.match(citekey)
-        if match is None:
-            click.echo("The citekey provided is not valid")
-            sys.exit()
-    else:
-        citekey = bbt.citation_picker()
-        if citekey is None:
-            sys.exit()
+    candidate = bbt.search(citekey)
+    if not candidate:
+        sys.exit()
 
     # If file doesn't exist, offer to create note
     notes_dir = Path(config["notes"])
@@ -144,7 +154,14 @@ def remove(citekey):
 
     CITEKEY is the cite key created by BBT.
     """
-    config = Configuration.load_config()
+    if not citekey:
+        click.echo("No citation key provided.")
+        sys.exit()
+
+    match = citekey_regex.match(citekey)
+    if match is None:
+        click.echo("The citekey provided is not valid")
+        sys.exit()
 
     try:
         bbt = BetterBibtex()
@@ -152,19 +169,14 @@ def remove(citekey):
         click.echo(e)
         sys.exit()
 
-    if citekey:
-        match = citekey_regex.match(citekey)
-        if match is None:
-            click.echo("The citekey provided is not valid")
-            sys.exit()
-    else:
-        citekey = bbt.citation_picker()
-        if citekey is None:
-            sys.exit()
+    candidate = bbt.search(citekey)
+    if not candidate:
+        sys.exit()
+    fieldValues = bbt.extract_fields(candidate)
 
     # Write output file
     notes_dir = Path(config["notes"])
-    outfile = notes_dir / f"{citekey}.md"
+    outfile = notes_dir / f"{fieldValues['citekey']}.md"
 
     if outfile.exists():
         choice = click.confirm("Are you sure you want to delete this note?")
