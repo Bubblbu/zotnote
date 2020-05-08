@@ -38,6 +38,8 @@ class Note:
         self.ts_iso = self.ts.isoformat(timespec="seconds")
         self.ts_day = self.ts.strftime("%m.%d.%y")
 
+        self.id = self.ts.strftime("%Y%m%d%H%M%S")
+
         self.author = config["name"]
         self.email = config["email"]
 
@@ -73,6 +75,7 @@ class Note:
         d = {
             "citekey": self.citekey,
             "author": self.author,
+            "id": self.id,
             "ts": self.ts_iso,
             "ts_day": self.ts_day,
             "title": self.fieldValues["title"],
