@@ -17,6 +17,11 @@ from .notes.note import Note
 from .utils.helpers import citekey_regex
 
 
+def edit_note(note):
+    """Edit selected note."""
+    os.system(f"{config['editor']} {str(note)}")
+
+
 def create_note(fieldValues, force, template):
     """Create reading note for CITEKEY in your Zotero library."""
     citekey = fieldValues["citekey"]
@@ -41,7 +46,7 @@ def create_note(fieldValues, force, template):
                 "Use --force to overwrite files."
             )
             if choice:
-                os.system(f"{config['editor']} {str(outfile)}")
+                edit_note(outfile)
     else:
         click.echo(f"Writing {str(outfile)}")
 
@@ -125,11 +130,12 @@ def edit(citekey, force, template):
     notes_dir = Path(config["notes"])
     outfile = notes_dir / f"{fieldValues['citekey']}.md"
     if outfile.exists():
-        os.system(f"{config['editor']} {str(outfile)}")
+        edit_note(outfile)
     else:
         choice = click.confirm("File does not exist yet. Create now?")
         if choice:
             create_note(fieldValues, force, template)
+            edit_note(outfile)
         else:
             sys.exit()
 
