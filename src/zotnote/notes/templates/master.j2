@@ -1,7 +1,8 @@
 ---
 key: {{ citekey }}
-date: {{ ts }}
-author: {{ author }}
+date: "{{ ts }}"
+author: "{{ author }}"
+title: "{{ title }}"
 ---
 
 # {{ title }}
@@ -16,7 +17,9 @@ author: {{ author }}
 | DOI | {% if doi %} [{{ doi }}](https://doi.org/{{ doi }}) {% else %}  {% endif %} |
 | Date | {{ date }} |
 
-*Keywords*:
+Keywords:
+
+Related notes:
 
 ---
 
